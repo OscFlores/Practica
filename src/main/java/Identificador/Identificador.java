@@ -5,6 +5,16 @@
  */
 package Identificador;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Oscar
@@ -115,6 +125,44 @@ public class Identificador extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+            File archivo = new File("archivo.txt");
+        PrintWriter escribir;
+        try {
+            escribir = new PrintWriter(archivo);
+            escribir.print(jTextField1.getText());
+            escribir.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Identificador.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        try {
+            Reader lector = new BufferedReader(new FileReader("archivo.txt"));
+            Lexer lexer = new Lexer(lector);
+            String resultado = "";
+            while (true) {
+                Tokens tokens = lexer.yylex();
+                if (tokens == null) {
+                    resultado += "FIN";
+                    txtResultado.setText(resultado);
+                    return;
+                }
+                switch (tokens) {
+                    case ERROR:
+                        resultado += "Simbolo no definido\n";
+                        break;
+                    case Identificador: case Numero: case Reservadas:
+                        resultado += lexer.lexeme + ": Es un " + tokens + "\n";
+                        break;
+                    default:
+                        resultado += "Token: " + tokens + "\n";
+                        break;
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Identificador.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Identificador.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
